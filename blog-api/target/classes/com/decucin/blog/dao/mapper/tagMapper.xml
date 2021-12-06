@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.decucin.blog.dao.mapper.TagMapper">
+
+    <select id="findTagsByArticleId" parameterType="java.lang.Long" resultType="com.decucin.blog.dao.pojo.Tag">
+        select id, tag_name as tagName from decucin_tag
+        where id in
+        (select tag_id from decucin_article_tag where article_id = #{id})
+    </select>
+
+
+    <select id="findHotTagIds" parameterType="int" resultType="java.lang.Long">
+        select tag_id as tagId from decucin_article_tag group by tag_id order by count(*) desc limit #{limit}
+    </select>
+
+</mapper>
