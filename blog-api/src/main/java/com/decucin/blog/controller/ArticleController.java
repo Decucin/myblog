@@ -1,11 +1,13 @@
 package com.decucin.blog.controller;
 
 
-import com.decucin.blog.vo.params.PageParams;
-import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.ArticleService;
+import com.decucin.blog.vo.Result;
+import com.decucin.blog.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 /**
@@ -45,5 +47,9 @@ public class ArticleController {
     @GetMapping("notLike")
     public Result notLikeArticle(@RequestHeader("Authorization") String token, Long articleId){
         return articleService.notLikeArticle(token, articleId);
+    }
+    @RequestMapping("/key")
+    public Result search(@PathVariable("key")String key) throws IOException {
+        return articleService.search(key);
     }
 }

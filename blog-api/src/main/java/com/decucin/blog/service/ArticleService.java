@@ -3,6 +3,8 @@ package com.decucin.blog.service;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.vo.params.PageParams;
 
+import java.io.IOException;
+
 public interface ArticleService {
     Result findAll(PageParams pageParams);
 
@@ -17,4 +19,6 @@ public interface ArticleService {
     Result addCommentCount(Long articleId);
 
     Result deleteCommentCount(Long articleId);
+
+    Result search(String key) throws IOException;
 }
