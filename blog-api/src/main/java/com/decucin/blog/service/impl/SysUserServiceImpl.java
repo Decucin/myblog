@@ -89,12 +89,21 @@ public class SysUserServiceImpl implements SysUserService {
         if(StringUtils.isNullOrEmpty(token)) {
             return Result.fail(200, "Token不合法！");
         }
+<<<<<<< HEAD
         String username = JWTTokenUtils.getTokenBody(token).get("username").toString();
         if(username == null){
             return Result.fail(200, "Token不合法！");
         }
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysUser::getAccount, username);
+=======
+        String id = JWTTokenUtils.getTokenBody(token).get("id").toString();
+        if(id == null){
+            return Result.fail(200, "Token不合法！");
+        }
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getId, id);
+>>>>>>> master
         queryWrapper.last("limit 1");
         SysUser user = sysUserMapper.selectOne(queryWrapper);
         if(user == null){
@@ -126,18 +135,32 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     /**
+<<<<<<< HEAD
      * @param id
+=======
+     * @param token
+>>>>>>> master
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/23 16:11
     **/
     @Override
+<<<<<<< HEAD
     public Result showInfo(Long id) {
         /**
          *  TODO 通过id查询用户信息
          *  @author decucin
          *  @date 2021/10/25 12:07
          **/
+=======
+    public Result showInfo(String token) {
+        /**
+         *  TODO 通过token查询用户自身信息
+         *  @author decucin
+         *  @date 2021/10/25 12:07
+         **/
+        Long id = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+>>>>>>> master
         SysUser user = sysUserMapper.selectById(id);
         // 判断用户id是否正确（数据库中是否存在）
         if(user == null){

@@ -28,6 +28,7 @@ public class CommentController {
     }
 
     @GetMapping("like")
+<<<<<<< HEAD
     public Result likeComment(Long userId, Long commentId){
         return commentService.likeComment(userId, commentId);
     }
@@ -35,6 +36,15 @@ public class CommentController {
     @GetMapping("notLike")
     public Result notLikeComment(Long userId, Long commentId){
         return commentService.notLikeComment(userId, commentId);
+=======
+    public Result likeComment(@RequestHeader("Authorization") String token, Long commentId){
+        return commentService.likeComment(token, commentId);
+    }
+
+    @GetMapping("notLike")
+    public Result notLikeComment(@RequestHeader("Authorization") String token, Long commentId){
+        return commentService.notLikeComment(token, commentId);
+>>>>>>> master
     }
 
     @PostMapping("add/{articleId}")

@@ -1,12 +1,23 @@
 package com.decucin.blog.controller;
 
 
+<<<<<<< HEAD
 import com.decucin.blog.vo.params.PageParams;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+=======
+import com.decucin.blog.service.ArticleService;
+import com.decucin.blog.vo.Result;
+import com.decucin.blog.vo.params.PageParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
+>>>>>>> master
 
 /**
  * @author ：decucin
@@ -38,6 +49,7 @@ public class ArticleController {
     }
 
     @GetMapping("like")
+<<<<<<< HEAD
     public Result likeArticle(Long userId, Long articleId){
         return articleService.likeArticle(userId, articleId);
     }
@@ -45,5 +57,18 @@ public class ArticleController {
     @GetMapping("notLike")
     public Result notLikeArticle(Long userId, Long articleId){
         return articleService.notLikeArticle(userId, articleId);
+=======
+    public Result likeArticle(@RequestHeader("Authorization") String token, Long articleId){
+        return articleService.likeArticle(token, articleId);
+    }
+
+    @GetMapping("notLike")
+    public Result notLikeArticle(@RequestHeader("Authorization") String token, Long articleId){
+        return articleService.notLikeArticle(token, articleId);
+    }
+    @RequestMapping("/key")
+    public Result search(@PathVariable("key")String key) throws IOException {
+        return articleService.search(key);
+>>>>>>> master
     }
 }

@@ -47,7 +47,11 @@ public class JWTTokenUtils {
          *  @date 2021/10/25 12:07
          **/
         Map<String, Object> claims = new HashMap<>();
+<<<<<<< HEAD
         claims.put("username", user.getAccount());
+=======
+        claims.put("id", user.getId());
+>>>>>>> master
         // 根据是否记住我选择过期时间
         long expiration = EXPIRATION;
         return Jwts.builder()
@@ -81,4 +85,9 @@ public class JWTTokenUtils {
                 .parseClaimsJws(token)
                 .getBody();
     }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> master
 }

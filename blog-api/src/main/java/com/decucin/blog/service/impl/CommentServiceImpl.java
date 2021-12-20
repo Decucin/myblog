@@ -6,6 +6,10 @@ import com.decucin.blog.dao.mapper.CommentMapper;
 import com.decucin.blog.dao.pojo.Article;
 import com.decucin.blog.dao.pojo.Comment;
 import com.decucin.blog.service.ArticleService;
+<<<<<<< HEAD
+=======
+import com.decucin.blog.utils.JWTTokenUtils;
+>>>>>>> master
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.service.CommentService;
@@ -52,19 +56,31 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
+<<<<<<< HEAD
     *  @param userId
+=======
+    *  @param token
+>>>>>>> master
     *  @param commentId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:23
     **/
     @Override
+<<<<<<< HEAD
     public Result likeComment(Long userId, Long commentId) {
+=======
+    public Result likeComment(String token, Long commentId) {
+>>>>>>> master
         /**
          *  TODO userId对应用户点赞commentId对应评论
          *  @author decucin
          *  @date 2021/10/20 19:58
          **/
+<<<<<<< HEAD
+=======
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+>>>>>>> master
         Comment comment = commentMapper.selectById(commentId);
         if(comment == null){
             return Result.fail(407, "评论不存在");
@@ -86,19 +102,31 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
+<<<<<<< HEAD
     *  @param userId
+=======
+    *  @param token
+>>>>>>> master
     *  @param commentId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:24
     **/
     @Override
+<<<<<<< HEAD
     public Result notLikeComment(Long userId, Long commentId) {
+=======
+    public Result notLikeComment(String token, Long commentId) {
+>>>>>>> master
         /**
          *  TODO userId对应用户取消点赞commentId对应评论
          *  @author decucin
          *  @date 2021/10/20 20:36
          **/
+<<<<<<< HEAD
+=======
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+>>>>>>> master
         Comment comment = commentMapper.selectById(commentId);
         if(comment == null){
             return Result.fail(404, "评论不存在！");

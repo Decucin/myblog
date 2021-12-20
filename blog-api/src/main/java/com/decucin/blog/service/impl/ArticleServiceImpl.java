@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.decucin.blog.dao.mapper.ArticleMapper;
 import com.decucin.blog.dao.pojo.Article;
+<<<<<<< HEAD
 import com.decucin.blog.service.BodyService;
 import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.service.TagService;
@@ -18,6 +19,40 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+=======
+import com.decucin.blog.service.ArticleService;
+import com.decucin.blog.service.BodyService;
+import com.decucin.blog.service.SysUserService;
+import com.decucin.blog.service.TagService;
+import com.decucin.blog.utils.JWTTokenUtils;
+import com.decucin.blog.vo.ArticleVo;
+import com.decucin.blog.vo.Result;
+import com.decucin.blog.vo.params.PageParams;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.ScoreSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+>>>>>>> master
 
 /**
  * @author ：decucin
@@ -30,6 +65,13 @@ import java.util.List;
 public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
+<<<<<<< HEAD
+=======
+    @Qualifier("restHighLevelClient")
+    private RestHighLevelClient client;
+
+    @Autowired
+>>>>>>> master
     private TagService tagService;
 
     @Autowired
@@ -112,19 +154,33 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+<<<<<<< HEAD
     *  @param userId
+=======
+    *  @param token
+>>>>>>> master
     *  @param articleId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:11
     **/
     @Override
+<<<<<<< HEAD
     public Result likeArticle(Long userId, Long articleId) {
         /**
          *  TODO 根据用户id以及文章id使该用户对此篇文章进行点赞
          *  @author decucin
          *  @date 2021/10/20 17:13
          **/
+=======
+    public Result likeArticle(String token, Long articleId) {
+        /**
+         *  TODO 根据token确定的用户id以及文章id使该用户对此篇文章进行点赞
+         *  @author decucin
+         *  @date 2021/10/20 17:13
+         **/
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+>>>>>>> master
         Article article = articleMapper.selectById(articleId);
         if(article == null){
             return Result.fail(404, "文章不存在！");
@@ -150,19 +206,31 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+<<<<<<< HEAD
     *  @param userId
+=======
+    *  @param token
+>>>>>>> master
     *  @param articleId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:13
     **/
     @Override
+<<<<<<< HEAD
     public Result notLikeArticle(Long userId, Long articleId) {
+=======
+    public Result notLikeArticle(String token, Long articleId) {
+>>>>>>> master
         /**
          *  TODO 根据用户id以及文章id使该用户对此篇文章进行取消点赞
          *  @author decucin
          *  @date 2021/10/20 17:39
          **/
+<<<<<<< HEAD
+=======
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+>>>>>>> master
         Article article = articleMapper.selectById(articleId);
         if(article == null){
             return Result.fail(404, "文章不存在！");
@@ -226,6 +294,67 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success(articleMapper.update(null, updateWrapper));
     }
 
+<<<<<<< HEAD
+=======
+    /***
+     * @description: elasticsearch搜索功能实现
+     * @param key
+     * @return: com.decucin.blog.vo.Result
+     * @author: decucin
+     * @date: 2021/12/9 20:27
+     */
+    @Override
+    public Result search(String key) throws IOException {
+
+        String index = "body";
+        String field = "content";
+
+        SearchRequest request = new SearchRequest();
+        request.indices(index);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(QueryBuilders.matchQuery(field, key).minimumShouldMatch("70%"));
+        sourceBuilder.sort(new ScoreSortBuilder().order(SortOrder.DESC));  //DESC降序
+
+        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+
+        //高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        HighlightBuilder.Field content =
+                new HighlightBuilder.Field(field);
+
+        content.highlighterType("unified");
+        highlightBuilder.field(content);
+        highlightBuilder.requireFieldMatch(Boolean.TRUE);
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+        sourceBuilder.highlighter(highlightBuilder);
+
+        request.source(sourceBuilder);
+        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+
+        SearchHits hits = search.getHits();
+
+        ArrayList<Map<String,Object>> list = new ArrayList<>();
+        for (SearchHit hit : hits) {
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            HighlightField title = highlightFields.get(field);
+            Map<String,Object> sourceAsMap = hit.getSourceAsMap();  //没高亮的数据
+            System.out.println(sourceAsMap);
+            if(title != null){
+                Text[] fragments = title.fragments();
+                String n_title = "";
+                for (Text text : fragments) {
+                    n_title += text;
+                }
+                sourceAsMap.put(field,n_title);   //把高亮字段替换掉原本的内容即可
+            }
+            list.add(sourceAsMap);
+
+        }
+        return Result.success(list);
+    }
+
+>>>>>>> master
     /**
     *  @param articleList
     *  @param isTags
