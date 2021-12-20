@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.decucin.blog.dao.mapper.ArticleMapper;
 import com.decucin.blog.dao.pojo.Article;
-<<<<<<< HEAD
 import com.decucin.blog.service.BodyService;
 import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.service.TagService;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-=======
 import com.decucin.blog.service.ArticleService;
 import com.decucin.blog.service.BodyService;
 import com.decucin.blog.service.SysUserService;
@@ -52,7 +50,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
->>>>>>> master
 
 /**
  * @author ：decucin
@@ -65,13 +62,10 @@ import java.util.concurrent.TimeUnit;
 public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
-<<<<<<< HEAD
-=======
     @Qualifier("restHighLevelClient")
     private RestHighLevelClient client;
 
     @Autowired
->>>>>>> master
     private TagService tagService;
 
     @Autowired
@@ -154,25 +148,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-<<<<<<< HEAD
-    *  @param userId
-=======
-    *  @param token
->>>>>>> master
     *  @param articleId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:11
     **/
     @Override
-<<<<<<< HEAD
-    public Result likeArticle(Long userId, Long articleId) {
-        /**
-         *  TODO 根据用户id以及文章id使该用户对此篇文章进行点赞
-         *  @author decucin
-         *  @date 2021/10/20 17:13
-         **/
-=======
     public Result likeArticle(String token, Long articleId) {
         /**
          *  TODO 根据token确定的用户id以及文章id使该用户对此篇文章进行点赞
@@ -180,7 +161,6 @@ public class ArticleServiceImpl implements ArticleService {
          *  @date 2021/10/20 17:13
          **/
         Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
->>>>>>> master
         Article article = articleMapper.selectById(articleId);
         if(article == null){
             return Result.fail(404, "文章不存在！");
@@ -206,31 +186,20 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-<<<<<<< HEAD
-    *  @param userId
-=======
-    *  @param token
->>>>>>> master
     *  @param articleId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:13
     **/
     @Override
-<<<<<<< HEAD
-    public Result notLikeArticle(Long userId, Long articleId) {
-=======
     public Result notLikeArticle(String token, Long articleId) {
->>>>>>> master
+
         /**
          *  TODO 根据用户id以及文章id使该用户对此篇文章进行取消点赞
          *  @author decucin
          *  @date 2021/10/20 17:39
          **/
-<<<<<<< HEAD
-=======
         Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
->>>>>>> master
         Article article = articleMapper.selectById(articleId);
         if(article == null){
             return Result.fail(404, "文章不存在！");
@@ -294,8 +263,6 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success(articleMapper.update(null, updateWrapper));
     }
 
-<<<<<<< HEAD
-=======
     /***
      * @description: elasticsearch搜索功能实现
      * @param key
@@ -354,7 +321,6 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success(list);
     }
 
->>>>>>> master
     /**
     *  @param articleList
     *  @param isTags

@@ -16,11 +16,9 @@ public interface SysUserService {
 
     Integer addUser(LoginParams loginParams);
 
-<<<<<<< HEAD
-    Result showInfo(Long id);
-=======
+
     Result showInfo(String token);
->>>>>>> master
+
 
     Result updateInfo(UserVo userVo);
 

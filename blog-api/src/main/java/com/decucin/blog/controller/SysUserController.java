@@ -27,14 +27,9 @@ public class SysUserController {
         return sysUserService.findUserVoByToken(token);
     }
 
-    @GetMapping("showInfo/{id}")
-<<<<<<< HEAD
-    public Result showInfo(@PathVariable("id") Long id){
-        return sysUserService.showInfo(id);
-=======
     public Result showInfo(@RequestHeader("Authorization") String token){
         return sysUserService.showInfo(token);
->>>>>>> master
+
     }
 
     @PostMapping("updateInfo")
