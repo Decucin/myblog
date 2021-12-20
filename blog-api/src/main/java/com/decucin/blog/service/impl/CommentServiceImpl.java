@@ -3,19 +3,16 @@ package com.decucin.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.decucin.blog.dao.mapper.CommentMapper;
-import com.decucin.blog.dao.pojo.Article;
 import com.decucin.blog.dao.pojo.Comment;
 import com.decucin.blog.service.ArticleService;
 import com.decucin.blog.utils.JWTTokenUtils;
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.service.CommentService;
-import com.decucin.blog.vo.params.CommentParams;
+import com.decucin.blog.vo.params.CommentParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author ：decucin
@@ -125,21 +122,21 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-    *  @param commentParams
+    *  @param commentParam
     *  @param articleId
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:24
     **/
     @Override
-    public Result addCommentToArticle(CommentParams commentParams, Long articleId) {
+    public Result addCommentToArticle(CommentParam commentParam, Long articleId) {
         /**
          *  TODO 将评论添加到articleId对应文章中
          *  @author decucin
          *  @date 2021/10/20 21:08
          **/
         // 首先将评论插入到评论列表中
-        Comment comment = new Comment(commentParams);
+        Comment comment = new Comment(commentParam);
         comment.setCreateTime(new Date());
         comment.setLikeCount(0);
         comment.setArticleId(articleId);

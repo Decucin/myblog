@@ -1,14 +1,14 @@
 package com.decucin.blog.service;
 
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.LoginParams;
+import com.decucin.blog.vo.params.LoginParam;
 
 public interface LoginService {
 
-    Result login(LoginParams loginParams);
+    Result login(LoginParam loginParam);
 
     Result logout(String token);
 
-    Result register(LoginParams loginParams);
+    Result register(LoginParam loginParam);
 
 }

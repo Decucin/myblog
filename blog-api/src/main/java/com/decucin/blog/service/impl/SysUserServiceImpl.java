@@ -10,8 +10,8 @@ import com.decucin.blog.vo.LoginUserVo;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.vo.UserVo;
-import com.decucin.blog.vo.params.LoginParams;
-import com.decucin.blog.vo.params.PasswordParams;
+import com.decucin.blog.vo.params.LoginParam;
+import com.decucin.blog.vo.params.PasswordParam;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,13 +104,13 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     /**
-     * @param loginParams
+     * @param loginParam
     *  @return java.lang.Integer
     *  @author decucin
     *  @date 2021/10/23 16:11
     **/
     @Override
-    public Integer addUser(LoginParams loginParams) {
+    public Integer addUser(LoginParam loginParam) {
         /**
          *  TODO 添加用户（注册）
          *  @author decucin
@@ -118,8 +118,8 @@ public class SysUserServiceImpl implements SysUserService {
          **/
         // 注意这里，前端传过来的信息中，用户名是正确的，但密码是经过AES加密的，因此注意此处需要处理
         SysUser user = new SysUser();
-        user.setAccount(loginParams.getUsername());
-        user.setPassword(PasswordUtils.formToDB(loginParams.getPassword()));
+        user.setAccount(loginParam.getUsername());
+        user.setPassword(PasswordUtils.formToDB(loginParam.getPassword()));
         user.setAdmin(false);
         user.setCreateDate(new Date());
         return sysUserMapper.insert(user);
@@ -179,7 +179,7 @@ public class SysUserServiceImpl implements SysUserService {
     *  @date 2021/10/25 12:34
     **/
     @Override
-    public Result changePassword(PasswordParams params) {
+    public Result changePassword(PasswordParam params) {
         /**
          *  TODO 修改用户密码
          *  @author decucin

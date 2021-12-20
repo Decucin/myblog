@@ -10,7 +10,7 @@ import lombok.Data;
  * @version: 1.0$
  */
 @Data
-public class PasswordParams {
+public class PasswordParam {
 
     private Long id;
     private String rawPassword;

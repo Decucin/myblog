@@ -1,6 +1,6 @@
 package com.decucin.blog.dao.pojo;
 
-import com.decucin.blog.vo.params.CommentParams;
+import com.decucin.blog.vo.params.CommentParam;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,10 +27,10 @@ public class Comment {
     private Integer likeCount;
     private Long articleId;
 
-    public Comment(CommentParams commentParams){
-        commentBody = commentParams.getCommentBody();
-        fromId = commentParams.getFromId();
-        toId = commentParams.getToId();
-        level = commentParams.getLevel();
+    public Comment(CommentParam commentParam){
+        commentBody = commentParam.getCommentBody();
+        fromId = commentParam.getFromId();
+        toId = commentParam.getToId();
+        level = commentParam.getLevel();
     }
 }

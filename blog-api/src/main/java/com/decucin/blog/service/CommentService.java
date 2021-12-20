@@ -1,8 +1,7 @@
 package com.decucin.blog.service;
 
-import com.decucin.blog.dao.pojo.Comment;
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.CommentParams;
+import com.decucin.blog.vo.params.CommentParam;
 
 public interface CommentService {
 
@@ -12,7 +11,7 @@ public interface CommentService {
 
     Result notLikeComment(String token, Long commentId);
 
-    Result addCommentToArticle(CommentParams commentParams, Long articleId);
+    Result addCommentToArticle(CommentParam commentParam, Long articleId);
 
     Result deleteCommentToArticle(Long commentId, Long articleId);
 }

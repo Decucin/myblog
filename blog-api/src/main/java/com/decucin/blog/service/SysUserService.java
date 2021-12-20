@@ -3,8 +3,8 @@ package com.decucin.blog.service;
 import com.decucin.blog.dao.pojo.SysUser;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.vo.UserVo;
-import com.decucin.blog.vo.params.LoginParams;
-import com.decucin.blog.vo.params.PasswordParams;
+import com.decucin.blog.vo.params.LoginParam;
+import com.decucin.blog.vo.params.PasswordParam;
 
 public interface SysUserService {
 
@@ -14,7 +14,7 @@ public interface SysUserService {
 
     Result findUserVoByToken(String token);
 
-    Integer addUser(LoginParams loginParams);
+    Integer addUser(LoginParam loginParam);
 
 
     Result showInfo(String token);
@@ -22,5 +22,5 @@ public interface SysUserService {
 
     Result updateInfo(UserVo userVo);
 
-    Result changePassword(PasswordParams params);
+    Result changePassword(PasswordParam params);
 }

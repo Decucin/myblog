@@ -3,7 +3,7 @@ package com.decucin.blog.controller;
 
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.CommentService;
-import com.decucin.blog.vo.params.CommentParams;
+import com.decucin.blog.vo.params.CommentParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +37,8 @@ public class CommentController {
     }
 
     @PostMapping("add/{articleId}")
-    public Result addCommentToArticle(@RequestBody CommentParams commentParams, @PathVariable("articleId") Long articleId){
-        return commentService.addCommentToArticle(commentParams, articleId);
+    public Result addCommentToArticle(@RequestBody CommentParam commentParam, @PathVariable("articleId") Long articleId){
+        return commentService.addCommentToArticle(commentParam, articleId);
     }
 
     @GetMapping("delete/{articleId}")

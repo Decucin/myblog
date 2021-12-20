@@ -2,7 +2,7 @@ package com.decucin.blog.controller;
 
 import com.decucin.blog.service.LoginService;
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.LoginParams;
+import com.decucin.blog.vo.params.LoginParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +20,8 @@ public class LoginController {
     private LoginService loginService;
 
     @PostMapping("login")
-    public Result login(@RequestBody LoginParams loginParams){
-        return loginService.login(loginParams);
+    public Result login(@RequestBody LoginParam loginParam){
+        return loginService.login(loginParam);
     }
 
     @GetMapping("logout")
@@ -30,8 +30,8 @@ public class LoginController {
     }
 
     @PostMapping("register")
-    public Result register(@RequestBody LoginParams loginParams){
-        return loginService.register(loginParams);
+    public Result register(@RequestBody LoginParam loginParam){
+        return loginService.register(loginParam);
     }
 
 }

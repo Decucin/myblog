@@ -107,4 +107,20 @@ public class TagServiceImpl implements TagService {
         }
         return Result.success(tagNames.length);
     }
+
+    @Override
+    public Tag findTagByTagName(String tagName) {
+        LambdaQueryWrapper<Tag> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Tag::getTagName, tagName).last("limit 1");
+        Tag tag = tagMapper.selectOne(lambdaQueryWrapper);
+        return tag;
+    }
+
+    @Override
+    public Long insertTag(String tagName) {
+        Tag tag = new Tag();
+        tag.setTagName(tagName);
+        tagMapper.insert(tag);
+        return tag.getId();
+    }
 }

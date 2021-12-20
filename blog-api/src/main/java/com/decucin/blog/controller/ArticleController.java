@@ -1,15 +1,10 @@
 package com.decucin.blog.controller;
 
 
-import com.decucin.blog.vo.params.PageParams;
+import com.decucin.blog.vo.params.ArticleParam;
+import com.decucin.blog.vo.params.PageParam;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.ArticleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.decucin.blog.service.ArticleService;
-import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +26,13 @@ public class ArticleController {
     private ArticleService articleService;
 
     @PostMapping
-    public Result findAll(@RequestBody PageParams pageParams){
-        return articleService.findAll(pageParams);
+    public Result findAll(@RequestBody PageParam pageParam){
+        return articleService.findAll(pageParam);
     }
 
     @PostMapping("findCategory")
-    public Result findArticleByCategory(@RequestBody PageParams pageParams, @RequestParam("id") Long categoryId){
-        return articleService.findArticleByCategory(pageParams, categoryId);
+    public Result findArticleByCategory(@RequestBody PageParam pageParam, @RequestParam("id") Long categoryId){
+        return articleService.findArticleByCategory(pageParam, categoryId);
     }
 
     @GetMapping("{articleId}")
@@ -59,5 +54,10 @@ public class ArticleController {
     public Result search(@PathVariable("key")String key) throws IOException {
         return articleService.search(key);
 
+    }
+
+    @PostMapping("add")
+    public Result addArticle(@RequestHeader String token, @RequestBody ArticleParam articleParam){
+        return articleService.addArticle(token, articleParam);
     }
 }

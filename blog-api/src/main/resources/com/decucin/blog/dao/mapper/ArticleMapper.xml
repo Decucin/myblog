@@ -6,6 +6,10 @@
         insert into decucin_like_article values(null, #{userId}, #{articleId}, 1)
     </insert>
 
+    <insert id="insertTag" parameterType="java.lang.Long">
+        insert into decucin_article_tag values (null, #{articleId}, #{tagId})
+    </insert>
+
     <update id="updateLike" parameterType="java.lang.Long">
         update decucin_like_article set if_like = 1 where user_id = #{userId} and article_id = #{articleId}
     </update>

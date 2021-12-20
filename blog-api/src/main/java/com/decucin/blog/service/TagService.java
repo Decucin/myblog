@@ -14,4 +14,8 @@ public interface TagService {
     Result hotTags(int limit);
 
     Result addTags(String[] tagNames);
+
+    Tag findTagByTagName(String tagName);
+
+    Long insertTag(String tagName);
 }

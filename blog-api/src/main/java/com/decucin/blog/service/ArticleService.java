@@ -1,15 +1,16 @@
 package com.decucin.blog.service;
 
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.PageParams;
+import com.decucin.blog.vo.params.ArticleParam;
+import com.decucin.blog.vo.params.PageParam;
 
 import java.io.IOException;
 
 
 public interface ArticleService {
-    Result findAll(PageParams pageParams);
+    Result findAll(PageParam pageParam);
 
-    Result findArticleByCategory(PageParams pageParams, Long categoryId);
+    Result findArticleByCategory(PageParam pageParam, Long categoryId);
 
     Result findArticleInfo(Long id);
 
@@ -22,4 +23,6 @@ public interface ArticleService {
     Result deleteCommentCount(Long articleId);
 
     Result search(String key) throws IOException;
+
+    Result addArticle(String token, ArticleParam articleParam);
 }

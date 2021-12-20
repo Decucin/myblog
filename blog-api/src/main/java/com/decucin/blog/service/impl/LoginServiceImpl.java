@@ -7,7 +7,7 @@ import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.utils.JWTTokenUtils;
 import com.decucin.blog.utils.PasswordUtils;
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.LoginParams;
+import com.decucin.blog.vo.params.LoginParam;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,25 +33,25 @@ public class LoginServiceImpl implements LoginService {
     private RedisTemplate redisTemplate;
 
     /**
-     * @param loginParams
+     * @param loginParam
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/23 15:01
     **/
     @Override
-    public Result login(LoginParams loginParams){
+    public Result login(LoginParam loginParam){
         /**
          *  TODO 登录功能
          *  @author decucin
          *  @date 2021/10/25 12:07
          **/
-        SysUser user = userService.findUserByUsername(loginParams.getUsername());
+        SysUser user = userService.findUserByUsername(loginParam.getUsername());
         if(user == null){
             return Result.fail(400, "用户不存在！");
         }
         // 此时已经确保能找到对应的user
 
-        if(PasswordUtils.formCompareDB(loginParams.getPassword(), user.getPassword())){
+        if(PasswordUtils.formCompareDB(loginParam.getPassword(), user.getPassword())){
             // 创建token
             String token = JWTTokenUtils.createToken(user, true);
             // 将token放入redis中
@@ -83,27 +83,27 @@ public class LoginServiceImpl implements LoginService {
     }
 
     /**
-     * @param loginParams
+     * @param loginParam
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/23 15:01
     **/
     @Override
-    public Result register(LoginParams loginParams) {
+    public Result register(LoginParam loginParam) {
         /**
          *  TODO 注册功能
          *  @author decucin
          *  @date 2021/10/25 12:07
          **/
         // 用户名密码正确性校验
-        if(StringUtils.isNullOrEmpty(loginParams.getUsername()) || StringUtils.isNullOrEmpty(loginParams.getPassword())){
+        if(StringUtils.isNullOrEmpty(loginParam.getUsername()) || StringUtils.isNullOrEmpty(loginParam.getPassword())){
             return Result.fail(300, "用户名或密码不能为空！");
         }
         // 判断该用户是否存在
-        if(userService.findUserByUsername(loginParams.getUsername()) != null){
+        if(userService.findUserByUsername(loginParam.getUsername()) != null){
             return Result.fail(301, "该用户已存在！");
         }
         // 此时已经能确保用户未存在，并且注册用户输入了不为空的用户名和密码
-        return Result.success(userService.addUser(loginParams));
+        return Result.success(userService.addUser(loginParam));
     }
 }

@@ -4,28 +4,27 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.decucin.blog.dao.mapper.ArticleMapper;
+import com.decucin.blog.dao.mapper.BodyMapper;
 import com.decucin.blog.dao.pojo.Article;
+import com.decucin.blog.dao.pojo.Body;
+import com.decucin.blog.dao.pojo.Tag;
 import com.decucin.blog.service.BodyService;
 import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.service.TagService;
 import com.decucin.blog.vo.ArticleVo;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.ArticleService;
-import com.decucin.blog.vo.params.PageParams;
+import com.decucin.blog.vo.params.ArticleParam;
+import com.decucin.blog.vo.params.PageParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import com.decucin.blog.service.ArticleService;
-import com.decucin.blog.service.BodyService;
-import com.decucin.blog.service.SysUserService;
-import com.decucin.blog.service.TagService;
+
 import com.decucin.blog.utils.JWTTokenUtils;
-import com.decucin.blog.vo.ArticleVo;
-import com.decucin.blog.vo.Result;
-import com.decucin.blog.vo.params.PageParams;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -40,14 +39,9 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.ScoreSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -60,6 +54,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class ArticleServiceImpl implements ArticleService {
+
+    @Autowired
+    private BodyMapper bodyMapper;
 
     @Autowired
     @Qualifier("restHighLevelClient")
@@ -78,19 +75,19 @@ public class ArticleServiceImpl implements ArticleService {
     private BodyService bodyService;
 
     /**
-    *  @param pageParams
+    *  @param pageParam
     *  @return com.decucin.blog.vo.Result
     *  @author decucin
     *  @date 2021/10/25 12:07
     **/
     @Override
-    public Result findAll(PageParams pageParams) {
+    public Result findAll(PageParam pageParam) {
         /**
          *  TODO 找到首页全部文章并以List<ArticleVo>形式返回(不含文章内容)
          *  @author decucin
          *  @date 2021/10/25 12:07
          **/
-        Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
+        Page<Article> page = new Page<>(pageParam.getPage(), pageParam.getPageSize());
         LambdaQueryWrapper<Article> queryWrapper= new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Article::getWeight, Article::getCreateDate);
         Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
@@ -109,13 +106,13 @@ public class ArticleServiceImpl implements ArticleService {
     *  @date 2021/10/20 16:05
     **/
     @Override
-    public Result findArticleByCategory(PageParams pageParams, Long categoryId) {
+    public Result findArticleByCategory(PageParam pageParam, Long categoryId) {
         /**
         *  TODO 根据标签id找到对应的文章列表并以List<ArticleVo>形式返回(不含文章内容)
         *  @author decucin
         *  @date 2021/10/20 16:07
         **/
-        Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
+        Page<Article> page = new Page<>(pageParam.getPage(), pageParam.getPageSize());
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Article::getCategoryId, categoryId);
         Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
@@ -319,6 +316,54 @@ public class ArticleServiceImpl implements ArticleService {
 
         }
         return Result.success(list);
+    }
+
+    /**
+     * @description: 文章发布功能实现
+     * @param token
+     * @param articleParam
+     * @return: com.decucin.blog.vo.Result
+     * @author: decucin
+     * @date: 2021/12/20 19:31
+     */
+    @Override
+    public Result addArticle(String token, ArticleParam articleParam) {
+        Body body = new Body();
+        body.setContent(articleParam.getContent());
+        body.setContentHtml(articleParam.getContentHtml());
+        bodyMapper.insert(body);
+        Long bodyId = body.getId();
+        Article article = new Article();
+        article.setAuthorId((Long) JWTTokenUtils.getTokenBody(token).get("id"));
+        article.setBodyId(bodyId);
+        article.setCreateDate(new Date());
+        article.setLikeCount(0);
+        article.setCategoryId(articleParam.getCategoryId());
+        article.setCommentCount(0);
+        article.setSummary(articleParam.getSummary());
+        article.setTitle(articleParam.getTitle());
+        article.setViewCount(0);
+        article.setWeight(0);
+        articleMapper.insert(article);
+        Long articleId = article.getId();
+
+        List<String> tags = articleParam.getTags();
+        ArrayList<Long> tagIds = new ArrayList<>();
+        for (String tagName : tags){
+            Tag tag = tagService.findTagByTagName(tagName);
+            Long tagId;
+            if (tag == null) {
+                tagId = tagService.insertTag(tagName);
+            }else {
+                tagId = tag.getId();
+            }
+            tagIds.add(tagId);
+        }
+
+        for(Long tagId : tagIds){
+            articleMapper.insertTag(articleId, tagId);
+        }
+        return Result.success("文章发布成功！");
     }
 
     /**

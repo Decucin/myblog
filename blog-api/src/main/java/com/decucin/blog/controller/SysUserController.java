@@ -3,7 +3,7 @@ package com.decucin.blog.controller;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.vo.UserVo;
-import com.decucin.blog.vo.params.PasswordParams;
+import com.decucin.blog.vo.params.PasswordParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +38,7 @@ public class SysUserController {
     }
 
     @PostMapping("changePassword")
-    public Result changePassword(@RequestBody PasswordParams params){
+    public Result changePassword(@RequestBody PasswordParam params){
         return sysUserService.changePassword(params);
     }
 }

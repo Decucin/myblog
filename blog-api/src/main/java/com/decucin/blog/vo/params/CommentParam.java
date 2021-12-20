@@ -10,7 +10,7 @@ import lombok.Data;
  * @version: 1.0$
  */
 @Data
-public class CommentParams {
+public class CommentParam {
     private String commentBody;
     private Long fromId;
     private Long toId;

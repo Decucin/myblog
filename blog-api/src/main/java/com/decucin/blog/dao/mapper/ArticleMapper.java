@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.decucin.blog.dao.pojo.Article;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface ArticleMapper extends BaseMapper<Article> {
     Boolean selectIfLike(Long userId, Long articleId);
@@ -13,4 +15,6 @@ public interface ArticleMapper extends BaseMapper<Article> {
     Long updateLike(Long userId, Long articleId);
 
     Long cancelLike(Long userId, Long articleId);
+
+    void insertTag(Long articleId, Long tagId);
 }
