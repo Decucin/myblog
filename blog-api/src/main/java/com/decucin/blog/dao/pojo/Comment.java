@@ -29,7 +29,6 @@ public class Comment {
 
     public Comment(CommentParam commentParam){
         commentBody = commentParam.getCommentBody();
-        fromId = commentParam.getFromId();
         toId = commentParam.getToId();
         level = commentParam.getLevel();
     }

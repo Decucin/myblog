@@ -11,7 +11,7 @@ public interface CommentService {
 
     Result notLikeComment(String token, Long commentId);
 
-    Result addCommentToArticle(CommentParam commentParam, Long articleId);
+    Result addCommentToArticle(String token, CommentParam commentParam, Long articleId);
 
-    Result deleteCommentToArticle(Long commentId, Long articleId);
+    Result deleteCommentToArticle(String token, Long commentId, Long articleId);
 }

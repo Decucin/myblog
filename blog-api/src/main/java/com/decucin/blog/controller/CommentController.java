@@ -37,12 +37,12 @@ public class CommentController {
     }
 
     @PostMapping("add/{articleId}")
-    public Result addCommentToArticle(@RequestBody CommentParam commentParam, @PathVariable("articleId") Long articleId){
-        return commentService.addCommentToArticle(commentParam, articleId);
+    public Result addCommentToArticle(@RequestHeader("Authorization") String token, @RequestBody CommentParam commentParam, @PathVariable("articleId") Long articleId){
+        return commentService.addCommentToArticle(token, commentParam, articleId);
     }
 
     @GetMapping("delete/{articleId}")
-    public Result deleteCommentToArticle(Long commentId, @PathVariable("articleId") Long articleId){
-        return commentService.deleteCommentToArticle(commentId, articleId);
+    public Result deleteCommentToArticle(@RequestHeader("Authorization") String token, Long commentId, @PathVariable("articleId") Long articleId){
+        return commentService.deleteCommentToArticle(token, commentId, articleId);
     }
 }

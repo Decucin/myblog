@@ -12,7 +12,6 @@ import lombok.Data;
 @Data
 public class PasswordParam {
 
-    private Long id;
     private String rawPassword;
     private String newPassword;
     private String passwordConfirm;

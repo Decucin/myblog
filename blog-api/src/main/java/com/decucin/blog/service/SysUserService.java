@@ -20,7 +20,7 @@ public interface SysUserService {
     Result showInfo(String token);
 
 
-    Result updateInfo(UserVo userVo);
+    Result updateInfo(String token, UserVo userVo);
 
-    Result changePassword(PasswordParam params);
+    Result changePassword(String token, PasswordParam params);
 }

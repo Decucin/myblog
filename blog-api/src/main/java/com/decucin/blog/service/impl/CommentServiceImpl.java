@@ -122,21 +122,21 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-    *  @param commentParam
-    *  @param articleId
-    *  @return com.decucin.blog.vo.Result
-    *  @author decucin
-    *  @date 2021/10/25 12:24
-    **/
+     * @description: 为文章添加评论
+     * @param token
+     * @param commentParam
+     * @param articleId
+     * @return: com.decucin.blog.vo.Result
+     * @author: decucin
+     * @date: 2021/12/21 12:40
+     */
     @Override
-    public Result addCommentToArticle(CommentParam commentParam, Long articleId) {
-        /**
-         *  TODO 将评论添加到articleId对应文章中
-         *  @author decucin
-         *  @date 2021/10/20 21:08
-         **/
+    public Result addCommentToArticle(String token, CommentParam commentParam, Long articleId) {
+        // 解析token
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
         // 首先将评论插入到评论列表中
         Comment comment = new Comment(commentParam);
+        comment.setFromId(userId);
         comment.setCreateTime(new Date());
         comment.setLikeCount(0);
         comment.setArticleId(articleId);
@@ -146,14 +146,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-    *  @param commentId
-    *  @param articleId
-    *  @return com.decucin.blog.vo.Result
-    *  @author decucin
-    *  @date 2021/10/25 12:26
-    **/
+     * @description: 删除自己的评论
+     * @param token
+     * @param commentId
+     * @param articleId
+     * @return: com.decucin.blog.vo.Result
+     * @author: decucin
+     * @date: 2021/12/21 12:44
+     */
     @Override
-    public Result deleteCommentToArticle(Long commentId, Long articleId) {
+    public Result deleteCommentToArticle(String token, Long commentId, Long articleId) {
         /**
          *  TODO 将评论从articleId对应文章中删除
          *  @author decucin
@@ -162,6 +164,9 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentMapper.selectById(commentId);
         if(comment == null){
             return Result.fail(406, "评论不存在！");
+        }
+        if(comment.getFromId() != (Long) JWTTokenUtils.getTokenBody(token).get("id")){
+            return Result.fail(407, "不能删除不是自己的评论！");
         }
         // 首先将评论从评论表中删除
         commentMapper.deleteById(commentId);

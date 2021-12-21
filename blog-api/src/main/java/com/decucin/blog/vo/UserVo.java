@@ -18,7 +18,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserVo {
-    private Long id;
     private String username;
     private String avatar;
     private String email;
@@ -33,12 +32,6 @@ public class UserVo {
     *  @date 2021/10/25 12:48
     **/
     public UserVo(SysUser user){
-        /**
-         *  TODO 通过user返回userVo对象
-         *  @author decucin
-         *  @date 2021/10/25 12:07
-         **/
-        id = user.getId();
         username = user.getAccount();
         nickname = user.getNickname();
         avatar = user.getAvatar();

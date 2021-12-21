@@ -122,6 +122,7 @@ public class SysUserServiceImpl implements SysUserService {
         user.setPassword(PasswordUtils.formToDB(loginParam.getPassword()));
         user.setAdmin(false);
         user.setCreateDate(new Date());
+        user.setNickname("用户" + user.getAccount());
         return sysUserMapper.insert(user);
     }
 
@@ -149,20 +150,21 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     /**
+     * @description: 更新用户信息
+     * @param token
      * @param userVo
-    *  @return com.decucin.blog.vo.Result
-    *  @author decucin
-    *  @date 2021/10/23 16:11
-    **/
+     * @return: com.decucin.blog.vo.Result
+     * @author: decucin
+     * @date: 2021/12/21 12:48
+     */
     @Override
-    public Result updateInfo(UserVo userVo) {
-        /**
-         *  TODO 更新用户信息
-         *  @author decucin
-         *  @date 2021/10/25 12:07
-         **/
+    public Result updateInfo(String token, UserVo userVo) {
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        if(JWTTokenUtils.getTokenBody(token).get("id") == null){
+            return Result.fail(403, "token不合法！");
+        }
         SysUser user = new SysUser();
-        user.setId(userVo.getId());
+        user.setId(userId);
         user.setAccount(userVo.getUsername());
         user.setNickname(userVo.getNickname());
         user.setAvatar(userVo.getAvatar());
@@ -173,18 +175,19 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     /**
-    *  @param params
-    *  @return com.decucin.blog.vo.Result
-    *  @author decucin
-    *  @date 2021/10/25 12:34
-    **/
+     * @description: 修改用户密码
+     * @param token
+     * @param params
+     * @return: com.decucin.blog.vo.Result
+     * @author: decucin
+     * @date: 2021/12/21 12:51
+     */
     @Override
-    public Result changePassword(PasswordParam params) {
-        /**
-         *  TODO 修改用户密码
-         *  @author decucin
-         *  @date 2021/10/25 12:07
-         **/
+    public Result changePassword(String token, PasswordParam params) {
+        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        if(userId == null){
+            return Result.fail(407, "token不合法！");
+        }
         // 注意这里发过来的密码是前端经过AES加密的
         // 首先判断密码和确认的密码是否相等（应该在前端处理，但考虑到任务量便交给了后端处理，这会导致用户第一时间得不到反馈）
         if(!params.getPasswordConfirm().equals(params.getNewPassword())){
@@ -192,7 +195,7 @@ public class SysUserServiceImpl implements SysUserService {
         }
         // 用户原密码与数据库中密码进行比对
         // 写到这里忽然想到将前端密码与数据库中密码比对部分单独提出一个工具类来实现，增加代码可用性
-        SysUser user = sysUserMapper.selectById(params.getId());
+        SysUser user = sysUserMapper.selectById(userId);
         if(user == null){
             return Result.fail(404, "用户信息不存在！");
         }
@@ -202,7 +205,7 @@ public class SysUserServiceImpl implements SysUserService {
         }
         String dbPassword = PasswordUtils.formToDB(params.getNewPassword());
         LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(SysUser::getId, params.getId()).set(SysUser::getPassword, dbPassword);
+        updateWrapper.eq(SysUser::getId, userId).set(SysUser::getPassword, dbPassword);
         return Result.success(sysUserMapper.update(null, updateWrapper));
     }
 }

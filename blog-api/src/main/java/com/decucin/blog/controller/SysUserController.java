@@ -27,18 +27,18 @@ public class SysUserController {
         return sysUserService.findUserVoByToken(token);
     }
 
+    @GetMapping("showInfo")
     public Result showInfo(@RequestHeader("Authorization") String token){
         return sysUserService.showInfo(token);
-
     }
 
     @PostMapping("updateInfo")
-    public Result updateInfo(@RequestBody UserVo userVo){
-        return sysUserService.updateInfo(userVo);
+    public Result updateInfo(@RequestHeader("Authorization") String token, @RequestBody UserVo userVo){
+        return sysUserService.updateInfo(token, userVo);
     }
 
     @PostMapping("changePassword")
-    public Result changePassword(@RequestBody PasswordParam params){
-        return sysUserService.changePassword(params);
+    public Result changePassword(@RequestHeader("Authorization") String token, @RequestBody PasswordParam params){
+        return sysUserService.changePassword(token, params);
     }
 }

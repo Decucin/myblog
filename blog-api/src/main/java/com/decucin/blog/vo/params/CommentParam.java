@@ -12,7 +12,6 @@ import lombok.Data;
 @Data
 public class CommentParam {
     private String commentBody;
-    private Long fromId;
     private Long toId;
     private Boolean level;
 }
