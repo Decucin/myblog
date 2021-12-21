@@ -41,7 +41,6 @@ public class ArticleController {
     }
 
     @GetMapping("like")
-
     public Result likeArticle(@RequestHeader("Authorization") String token, Long articleId){
         return articleService.likeArticle(token, articleId);
     }
@@ -57,7 +56,7 @@ public class ArticleController {
     }
 
     @PostMapping("add")
-    public Result addArticle(@RequestHeader String token, @RequestBody ArticleParam articleParam){
+    public Result addArticle(@RequestHeader("Authorization") String token, @RequestBody ArticleParam articleParam){
         return articleService.addArticle(token, articleParam);
     }
 }
