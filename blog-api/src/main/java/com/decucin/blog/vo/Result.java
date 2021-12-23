@@ -55,4 +55,8 @@ public class Result {
          **/
         return new Result(code, msg, null);
     }
+
+    public static  Result fail(ResultEnum resultEnum){
+        return fail(resultEnum.getCode(), resultEnum.getMsg());
+    }
 }

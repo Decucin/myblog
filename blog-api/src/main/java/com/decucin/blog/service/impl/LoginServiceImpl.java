@@ -7,6 +7,7 @@ import com.decucin.blog.service.SysUserService;
 import com.decucin.blog.utils.JWTTokenUtils;
 import com.decucin.blog.utils.PasswordUtils;
 import com.decucin.blog.vo.Result;
+import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.params.LoginParam;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class LoginServiceImpl implements LoginService {
          **/
         SysUser user = userService.findUserByUsername(loginParam.getUsername());
         if(user == null){
-            return Result.fail(400, "用户不存在！");
+            return Result.fail(ResultEnum.USER_NOT_EXIST);
         }
         // 此时已经确保能找到对应的user
 
@@ -60,7 +61,7 @@ public class LoginServiceImpl implements LoginService {
             ops.set("Token_"+token, JSON.toJSONString(user), 1, TimeUnit.DAYS);
             return Result.success(token);
         }else {
-            return Result.fail(400, "密码错误！");
+            return Result.fail(ResultEnum.ERROR_PASSWORD);
         }
     }
 
@@ -72,11 +73,15 @@ public class LoginServiceImpl implements LoginService {
     **/
     @Override
     public Result logout(String token) {
-        /**
-         *  TODO 登出功能
-         *  @author decucin
-         *  @date 2021/10/25 12:07
-         **/
+        Long userId;
+        try {
+            userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ERROR_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ERROR_TOKEN);
+        }
         // 登出实际上只需要将token从redis删除即可
         redisTemplate.delete("Token_"+token);
         return Result.success(null);
@@ -97,11 +102,11 @@ public class LoginServiceImpl implements LoginService {
          **/
         // 用户名密码正确性校验
         if(StringUtils.isNullOrEmpty(loginParam.getUsername()) || StringUtils.isNullOrEmpty(loginParam.getPassword())){
-            return Result.fail(300, "用户名或密码不能为空！");
+            return Result.fail(ResultEnum.NOT_NULL);
         }
         // 判断该用户是否存在
         if(userService.findUserByUsername(loginParam.getUsername()) != null){
-            return Result.fail(301, "该用户已存在！");
+            return Result.fail(ResultEnum.USER_EXIST);
         }
         // 此时已经能确保用户未存在，并且注册用户输入了不为空的用户名和密码
         return Result.success(userService.addUser(loginParam));

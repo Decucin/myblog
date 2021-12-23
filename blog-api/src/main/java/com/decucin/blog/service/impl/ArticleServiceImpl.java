@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.decucin.blog.dao.mapper.ArticleMapper;
 import com.decucin.blog.dao.mapper.BodyMapper;
+import com.decucin.blog.dao.mapper.CategoryMapper;
 import com.decucin.blog.dao.pojo.Article;
 import com.decucin.blog.dao.pojo.Body;
 import com.decucin.blog.dao.pojo.Tag;
@@ -14,6 +15,7 @@ import com.decucin.blog.service.TagService;
 import com.decucin.blog.vo.ArticleVo;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.ArticleService;
+import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.params.ArticleParam;
 import com.decucin.blog.vo.params.PageParam;
 import org.springframework.beans.BeanUtils;
@@ -54,6 +56,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class ArticleServiceImpl implements ArticleService {
+
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Autowired
     private BodyMapper bodyMapper;
@@ -141,7 +146,7 @@ public class ArticleServiceImpl implements ArticleService {
             articleMapper.update(null, updateWrapper);
             return Result.success(copy(article, true, true, true));
         }
-        return Result.fail(404, "文章不存在！");
+        return Result.fail(ResultEnum.NOT_FOUND);
     }
 
     /**
@@ -157,10 +162,18 @@ public class ArticleServiceImpl implements ArticleService {
          *  @author decucin
          *  @date 2021/10/20 17:13
          **/
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
         Article article = articleMapper.selectById(articleId);
         if(article == null){
-            return Result.fail(404, "文章不存在！");
+            return Result.fail(ResultEnum.NOT_FOUND);
         }
         Boolean ifLike = articleMapper.selectIfLike(userId, articleId);
         if(ifLike == null || !ifLike) {
@@ -179,7 +192,7 @@ public class ArticleServiceImpl implements ArticleService {
 
             return Result.success(articleMapper.update(null, updateWrapper));
         }
-        return Result.fail(300, "该文章已经点赞！");
+        return Result.fail(ResultEnum.ALREADY_OPERATE);
     }
 
     /**
@@ -190,16 +203,18 @@ public class ArticleServiceImpl implements ArticleService {
     **/
     @Override
     public Result notLikeArticle(String token, Long articleId) {
-
-        /**
-         *  TODO 根据用户id以及文章id使该用户对此篇文章进行取消点赞
-         *  @author decucin
-         *  @date 2021/10/20 17:39
-         **/
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
         Article article = articleMapper.selectById(articleId);
         if(article == null){
-            return Result.fail(404, "文章不存在！");
+            return Result.fail(ResultEnum.NOT_FOUND);
         }
         Boolean ifLike = articleMapper.selectIfLike(userId, articleId);
         if(ifLike){
@@ -213,7 +228,7 @@ public class ArticleServiceImpl implements ArticleService {
             return Result.success(articleMapper.update(null, updateWrapper));
         }
         // 这里表示用户还没有点赞
-        return Result.fail(301, "用户已经点赞了！");
+        return Result.fail(ResultEnum.ALREADY_OPERATE);
     }
 
     /**
@@ -231,7 +246,7 @@ public class ArticleServiceImpl implements ArticleService {
          **/
         Article article = articleMapper.selectById(articleId);
         if(article == null){
-            return Result.fail(404, "文章不存在");
+            return Result.fail(ResultEnum.NOT_FOUND);
         }
         LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Article::getId, articleId).set(Article::getCommentCount, article.getCommentCount() + 1);
@@ -253,7 +268,7 @@ public class ArticleServiceImpl implements ArticleService {
          **/
         Article article = articleMapper.selectById(articleId);
         if(article == null){
-            return Result.fail(404, "文章不存在！");
+            return Result.fail(ResultEnum.NOT_FOUND);
         }
         LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Article::getId, articleId).set(Article::getCommentCount, article.getCommentCount() - 1);
@@ -328,13 +343,22 @@ public class ArticleServiceImpl implements ArticleService {
      */
     @Override
     public Result addArticle(String token, ArticleParam articleParam) {
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
         Body body = new Body();
         body.setContent(articleParam.getContent());
         body.setContentHtml(articleParam.getContentHtml());
         bodyMapper.insert(body);
         Long bodyId = body.getId();
         Article article = new Article();
-        article.setAuthorId((Long) JWTTokenUtils.getTokenBody(token).get("id"));
+        article.setAuthorId(userId);
         article.setBodyId(bodyId);
         article.setCreateDate(new Date());
         article.setLikeCount(0);
@@ -405,6 +429,7 @@ public class ArticleServiceImpl implements ArticleService {
          **/
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article, articleVo);
+        articleVo.setCategory(categoryMapper.selectById(article.getCategoryId()).getClassifyName());
         if(isTags){
             Long articleId = article.getId();
             articleVo.setTags(tagService.findTagsByArticleId(articleId));

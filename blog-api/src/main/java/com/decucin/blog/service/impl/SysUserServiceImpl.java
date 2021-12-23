@@ -9,6 +9,7 @@ import com.decucin.blog.utils.PasswordUtils;
 import com.decucin.blog.vo.LoginUserVo;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.SysUserService;
+import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.UserVo;
 import com.decucin.blog.vo.params.LoginParam;
 import com.decucin.blog.vo.params.PasswordParam;
@@ -81,24 +82,25 @@ public class SysUserServiceImpl implements SysUserService {
     **/
     @Override
     public Result findUserVoByToken(String token) {
-        /**
-         *  TODO 通过token找到用户
-         *  @author decucin
-         *  @date 2021/10/25 12:07
-         **/
+
+        Long userId;
         if(StringUtils.isNullOrEmpty(token)) {
-            return Result.fail(200, "Token不合法！");
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
         }
-        String id = JWTTokenUtils.getTokenBody(token).get("id").toString();
-        if(id == null){
-            return Result.fail(200, "Token不合法！");
+        try {
+            userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ERROR_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
         }
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SysUser::getId, id);
+        queryWrapper.eq(SysUser::getId, userId);
         queryWrapper.last("limit 1");
         SysUser user = sysUserMapper.selectOne(queryWrapper);
         if(user == null){
-            return Result.fail(400, "用户不存在！");
+            return Result.fail(ResultEnum.USER_NOT_EXIST);
         }
         return Result.success(new LoginUserVo(user));
     }
@@ -134,16 +136,16 @@ public class SysUserServiceImpl implements SysUserService {
     **/
     @Override
     public Result showInfo(String token) {
-        /**
-         *  TODO 通过token查询用户自身信息
-         *  @author decucin
-         *  @date 2021/10/25 12:07
-         **/
-        Long id = (Long) JWTTokenUtils.getTokenBody(token).get("id");
-        SysUser user = sysUserMapper.selectById(id);
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        SysUser user = sysUserMapper.selectById(userId);
         // 判断用户id是否正确（数据库中是否存在）
         if(user == null){
-            return Result.fail(404, "用户信息不存在！");
+            return Result.fail(ResultEnum.USER_NOT_EXIST);
         }
         // 此时已经确保能查到user用户
         return Result.success(new UserVo(user));
@@ -159,9 +161,14 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public Result updateInfo(String token, UserVo userVo) {
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
-        if(JWTTokenUtils.getTokenBody(token).get("id") == null){
-            return Result.fail(403, "token不合法！");
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
         }
         SysUser user = new SysUser();
         user.setId(userId);
@@ -184,24 +191,29 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public Result changePassword(String token, PasswordParam params) {
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
         if(userId == null){
-            return Result.fail(407, "token不合法！");
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
         }
         // 注意这里发过来的密码是前端经过AES加密的
         // 首先判断密码和确认的密码是否相等（应该在前端处理，但考虑到任务量便交给了后端处理，这会导致用户第一时间得不到反馈）
         if(!params.getPasswordConfirm().equals(params.getNewPassword())){
-            return Result.fail(405, "用户两次输入的密码不一致！");
+            return Result.fail(ResultEnum.COMMENT_NOT_EXIST);
         }
         // 用户原密码与数据库中密码进行比对
         // 写到这里忽然想到将前端密码与数据库中密码比对部分单独提出一个工具类来实现，增加代码可用性
         SysUser user = sysUserMapper.selectById(userId);
         if(user == null){
-            return Result.fail(404, "用户信息不存在！");
+            return Result.fail(ResultEnum.USER_NOT_EXIST);
         }
         if(!PasswordUtils.formCompareDB(params.getRawPassword(), user.getPassword())){
             // 进入这个循环表示用户的密码输错了
-            return Result.fail(406, "用户输入的密码错误！");
+            return Result.fail(ResultEnum.ERROR_PASSWORD);
         }
         String dbPassword = PasswordUtils.formToDB(params.getNewPassword());
         LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();

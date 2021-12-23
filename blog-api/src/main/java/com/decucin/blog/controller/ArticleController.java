@@ -50,7 +50,7 @@ public class ArticleController {
         return articleService.notLikeArticle(token, articleId);
     }
     @RequestMapping("key")
-    public Result search(@PathVariable("key")String key) throws IOException {
+    public Result search(@PathVariable("key") String key) throws IOException {
         return articleService.search(key);
 
     }

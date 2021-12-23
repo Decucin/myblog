@@ -8,6 +8,7 @@ import com.decucin.blog.service.ArticleService;
 import com.decucin.blog.utils.JWTTokenUtils;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.service.CommentService;
+import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.params.CommentParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,11 +65,19 @@ public class CommentServiceImpl implements CommentService {
          *  @date 2021/10/20 19:58
          **/
 
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
 
         Comment comment = commentMapper.selectById(commentId);
         if(comment == null){
-            return Result.fail(407, "评论不存在");
+            return Result.fail(ResultEnum.COMMENT_NOT_EXIST);
         }
         Boolean ifLike = commentMapper.selectIfLike(userId, commentId);
         if(ifLike == null || !ifLike) {
@@ -83,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
             updateWrapper.eq(Comment::getId, commentId).set(Comment::getLikeCount, comment.getLikeCount() + 1);
             return Result.success(commentMapper.update(null, updateWrapper));
         }
-        return Result.fail(301, "该评论已点赞");
+        return Result.fail(ResultEnum.ALREADY_OPERATE);
     }
 
     /**
@@ -100,11 +109,19 @@ public class CommentServiceImpl implements CommentService {
          *  @author decucin
          *  @date 2021/10/20 20:36
          **/
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        Long userId;
+        try {
+            userId =(Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
+        if(userId == null){
+            return Result.fail(ResultEnum.ILLEGAL_TOKEN);
+        }
 
         Comment comment = commentMapper.selectById(commentId);
         if(comment == null){
-            return Result.fail(404, "评论不存在！");
+            return Result.fail(ResultEnum.COMMENT_NOT_EXIST);
         }
         Boolean ifLike = commentMapper.selectIfLike(userId, commentId);
         if(ifLike){
@@ -118,7 +135,7 @@ public class CommentServiceImpl implements CommentService {
             return Result.success(commentMapper.update(null, updateWrapper));
         }
         // 这里表示用户还没有点赞
-        return Result.fail(301, "用户已经点赞了！");
+        return Result.fail(ResultEnum.ALREADY_OPERATE);
     }
 
     /**
@@ -132,8 +149,13 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Result addCommentToArticle(String token, CommentParam commentParam, Long articleId) {
-        // 解析token
-        Long userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        Long userId;
+        try {
+            // 解析token
+             userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ERROR_TOKEN);
+        }
         // 首先将评论插入到评论列表中
         Comment comment = new Comment(commentParam);
         comment.setFromId(userId);
@@ -161,12 +183,19 @@ public class CommentServiceImpl implements CommentService {
          *  @author decucin
          *  @date 2021/10/20 21:40
          **/
+        Long userId;
+        try {
+            userId = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        }catch (Exception e){
+            return Result.fail(ResultEnum.ERROR_TOKEN);
+        }
         Comment comment = commentMapper.selectById(commentId);
         if(comment == null){
-            return Result.fail(406, "评论不存在！");
+            return Result.fail(ResultEnum.COMMENT_NOT_EXIST);
         }
-        if(comment.getFromId() != (Long) JWTTokenUtils.getTokenBody(token).get("id")){
-            return Result.fail(407, "不能删除不是自己的评论！");
+
+        if(comment.getFromId() !=  userId){
+            return Result.fail(ResultEnum.COMMENT_NOT_EXIST);
         }
         // 首先将评论从评论表中删除
         commentMapper.deleteById(commentId);

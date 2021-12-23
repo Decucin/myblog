@@ -10,9 +10,19 @@ package com.decucin.blog.vo;
  */
 public enum ResultEnum {
 
-
     SUCCESS(200, "success"),
-    NOT_FOUND (404, "page not found");
+    ILLEGAL_TOKEN(201,"illegal token"),
+    NOT_FOUND (404, "article not found"),
+    COMMENT_NOT_EXIST(406,"comment not exist"),
+    USER_NOT_EXIST(400,"user not exist"),
+//    LIKE(300, "operate successfully"),
+    ALREADY_OPERATE(301,"already operated"),
+    ILLEGAL_OPERATION(407, "illegal_operation"),
+    ERROR_PASSWORD(402,"error password"),
+//    ERROR_OPERATION(405,"error operation"),
+    ERROR_TOKEN(403,"illegal token"),
+    NOT_NULL(408, "username/password can not null"),
+    USER_EXIST(409, "user already exist");
 
     private int code;
     private String msg;
