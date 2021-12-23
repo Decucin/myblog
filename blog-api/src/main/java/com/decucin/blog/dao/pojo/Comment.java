@@ -1,6 +1,8 @@
 package com.decucin.blog.dao.pojo;
 
 import com.decucin.blog.vo.params.CommentParam;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
+
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String commentBody;
     private Long fromId;

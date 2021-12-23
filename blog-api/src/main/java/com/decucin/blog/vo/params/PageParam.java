@@ -1,6 +1,8 @@
 package com.decucin.blog.vo.params;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author ：decucin
@@ -10,6 +12,8 @@ import lombok.Data;
  * @version: 1.0$
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PageParam {
 
     private int page = 1;
