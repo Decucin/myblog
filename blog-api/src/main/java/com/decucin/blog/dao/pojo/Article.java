@@ -27,8 +27,11 @@ public class Article {
     private String title;
     private Integer viewCount;
     private Integer weight;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long authorId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long bodyId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long categoryId;
     private Integer likeCount;
 

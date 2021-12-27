@@ -24,11 +24,14 @@ public class Comment {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String commentBody;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long fromId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long toId;
     private Boolean level;
     private Date createTime;
     private Integer likeCount;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long articleId;
 
     public Comment(CommentParam commentParam){
