@@ -9,12 +9,9 @@ import com.decucin.blog.dao.mapper.CategoryMapper;
 import com.decucin.blog.dao.pojo.Article;
 import com.decucin.blog.dao.pojo.Body;
 import com.decucin.blog.dao.pojo.Tag;
-import com.decucin.blog.service.BodyService;
-import com.decucin.blog.service.SysUserService;
-import com.decucin.blog.service.TagService;
+import com.decucin.blog.service.*;
 import com.decucin.blog.vo.ArticleVo;
 import com.decucin.blog.vo.Result;
-import com.decucin.blog.service.ArticleService;
 import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.params.ArticleParam;
 import com.decucin.blog.vo.params.PageParam;
@@ -42,6 +39,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.ScoreSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Map;
@@ -55,6 +53,7 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0$
  */
 @Service
+@Transactional
 public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
@@ -78,6 +77,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private BodyService bodyService;
+
+    @Autowired
+    private ThreadService threadService;
 
     /**
     *  @param pageParam
@@ -141,9 +143,7 @@ public class ArticleServiceImpl implements ArticleService {
          **/
         Article article = articleMapper.selectById(id);
         if(article != null) {
-            LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(Article::getId, id).set(Article::getViewCount, article.getViewCount() + 1);
-            articleMapper.update(null, updateWrapper);
+            threadService.updateArticleViewCount(articleMapper, article);
             return Result.success(copy(article, true, true, true));
         }
         return Result.fail(ResultEnum.NOT_FOUND);
