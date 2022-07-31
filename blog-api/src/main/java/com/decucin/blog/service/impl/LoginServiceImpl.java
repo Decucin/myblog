@@ -9,11 +9,12 @@ import com.decucin.blog.utils.PasswordUtils;
 import com.decucin.blog.vo.Result;
 import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.params.LoginParam;
-import com.mysql.cj.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0$
  */
 @Service
+@Transactional
 public class LoginServiceImpl implements LoginService {
 
     @Autowired
@@ -101,7 +103,7 @@ public class LoginServiceImpl implements LoginService {
          *  @date 2021/10/25 12:07
          **/
         // 用户名密码正确性校验
-        if(StringUtils.isNullOrEmpty(loginParam.getUsername()) || StringUtils.isNullOrEmpty(loginParam.getPassword())){
+        if(StringUtils.isBlank(loginParam.getUsername()) || StringUtils.isBlank(loginParam.getPassword())){
             return Result.fail(ResultEnum.NOT_NULL);
         }
         // 判断该用户是否存在
@@ -110,5 +112,17 @@ public class LoginServiceImpl implements LoginService {
         }
         // 此时已经能确保用户未存在，并且注册用户输入了不为空的用户名和密码
         return Result.success(userService.addUser(loginParam));
+    }
+
+    @Override
+    public SysUser checkToken(String token){
+        if(StringUtils.isBlank(token)){
+            return null;
+        }
+        Long id = (Long) JWTTokenUtils.getTokenBody(token).get("id");
+        if(id == null){
+            return null;
+        }
+        return userService.findUserById(id);
     }
 }

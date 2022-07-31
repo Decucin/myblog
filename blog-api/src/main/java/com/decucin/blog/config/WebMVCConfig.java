@@ -1,7 +1,10 @@
 package com.decucin.blog.config;
 
+import com.decucin.blog.handler.LoginIntercepter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -14,9 +17,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMVCConfig implements WebMvcConfigurer {
 
+    @Autowired
+    private LoginIntercepter loginIntercepter;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // 跨域配置，将前端项目部署在8080端口
+        // 跨域配置，将前端项目部署在3000端口
         registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loginIntercepter)
+                .addPathPatterns("/test")
+                .excludePathPatterns("/login")
+                .excludePathPatterns("/register");
     }
 }

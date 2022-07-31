@@ -12,6 +12,7 @@ import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.vo.params.CommentParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -23,6 +24,7 @@ import java.util.Date;
  * @version: 1.0$
  */
 @Service
+@Transactional
 public class CommentServiceImpl implements CommentService {
 
     @Autowired

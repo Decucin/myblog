@@ -8,6 +8,7 @@ import com.decucin.blog.vo.ResultEnum;
 import com.decucin.blog.service.CategotyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
  * @version: 1.0$
  */
 @Service
+@Transactional
 public class CategoryServiceImpl implements CategotyService {
 
     @Autowired
